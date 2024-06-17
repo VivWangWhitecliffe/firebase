@@ -1,14 +1,13 @@
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Button,TextInput} from 'react-native';
+import { View, Text, StyleSheet, FlatList, TextInput, Button } from 'react-native';
 import { db } from './firebaseConfig';
-import { collection, getDocs,addDoc, updateDoc, doc, deleteDoc  } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 
 export default function App() {
   const [notes, setNotes] = useState([]);
   const [newNoteTitle, setNewNoteTitle] = useState('');
   const [newNoteContent, setNewNoteContent] = useState('');
-
+  const [editNoteId, setEditNoteId] = useState(null); // Initialize editNoteId state
 
   useEffect(() => {
     const fetchNotes = async () => {
@@ -29,6 +28,7 @@ export default function App() {
     setNewNoteTitle(title);  // Set the title of the note to current value
     setNewNoteContent(content);  // Set the content of the note to current value
   };
+  
   const handleUpdateNote = async () => {
     try {
       // Update the note in Firestore
@@ -52,8 +52,7 @@ export default function App() {
       console.error('Error updating note: ', error);
     }
   };
-
-
+  
   const handleAddNote = async () => {
     try {
       // Add a new note to Firestore
@@ -75,6 +74,7 @@ export default function App() {
       console.error('Error adding note: ', error);
     }
   };
+
   const handleDeleteNote = async (id) => {
     try {
       // Delete the note from Firestore
@@ -89,10 +89,9 @@ export default function App() {
     }
   };
 
-
   return (
     <View style={styles.container}>
-      
+      {/* Input fields for adding new note */}
       <TextInput
         style={styles.input}
         placeholder="Enter note title"
@@ -110,6 +109,7 @@ export default function App() {
         title="Add Note"
         onPress={handleAddNote}
       />
+
       {/* Input fields for editing note */}
       {editNoteId !== null && (
         <>
@@ -133,8 +133,7 @@ export default function App() {
         </>
       )}
 
-
-
+      {/* Display list of notes */}
       <FlatList
         data={notes}
         keyExtractor={item => item.id}
@@ -151,8 +150,6 @@ export default function App() {
               onPress={() => handleDeleteNote(item.id)}
               color="red"
             />
-
-
           </View>
         )}
       />
@@ -163,7 +160,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     padding: 20,
   },
   input: {
@@ -173,7 +169,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
-
   item: {
     padding: 10,
     borderBottomWidth: 1,
