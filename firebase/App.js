@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Button,TextInput} from 'react-native';
 import { db } from './firebaseConfig';
-import { collection, getDocs,addDoc, updateDoc  } from 'firebase/firestore';
+import { collection, getDocs,addDoc, updateDoc, doc, deleteDoc  } from 'firebase/firestore';
 
 export default function App() {
   const [notes, setNotes] = useState([]);
@@ -75,6 +75,19 @@ export default function App() {
       console.error('Error adding note: ', error);
     }
   };
+  const handleDeleteNote = async (id) => {
+    try {
+      // Delete the note from Firestore
+      await deleteDoc(doc(db, 'Notes', id));
+
+      // Update local state to remove the deleted note
+      setNotes(prevNotes =>
+        prevNotes.filter(note => note.id !== id)
+      );
+    } catch (error) {
+      console.error('Error deleting note: ', error);
+    }
+  };
 
 
   return (
@@ -121,6 +134,7 @@ export default function App() {
       )}
 
 
+
       <FlatList
         data={notes}
         keyExtractor={item => item.id}
@@ -132,6 +146,12 @@ export default function App() {
               title="Edit"
               onPress={() => handleEditNote(item.id, item.title, item.content)}
             />
+            <Button
+              title="Delete"
+              onPress={() => handleDeleteNote(item.id)}
+              color="red"
+            />
+
 
           </View>
         )}
